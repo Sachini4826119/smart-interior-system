@@ -1,24 +1,41 @@
 package com.sims.backend.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import jakarta.persistence.*;
-import lombok.*;
 
-@Entity
-@Data // Lombok automatically generates getters and setters
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "projects")
 public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // ✅ used in getName()
-    private String description; // ✅ used in getDescription()
-    private String title; // ✅ used in getTitle()
-    private String status; // ✅ used in getStatus()
+    private String name;
+    private String description;
+    private Double budget;
+
+    @ManyToOne
+    @JoinColumn(name = "designer_id")
+    private User designer; // Designer User
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    private Customer customer; // ✅ used in getCustomer()
+    private User customer; // Customer User
+
+    // Add missing getDesigner() method
+    public User getDesigner() {
+        return designer;
+    }
+
+    public User getCustomer() {
+        return customer;
+    }
+
+    // Other fields & methods...
 }

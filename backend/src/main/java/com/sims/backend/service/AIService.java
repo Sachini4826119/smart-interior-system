@@ -1,22 +1,36 @@
 package com.sims.backend.service;
 
+import com.sims.backend.entity.Project;
+import com.sims.backend.entity.User;
+import com.sims.backend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class AIService {
 
-    // Example method to generate textures (or any AI response)
-    public Map<String, Object> generateTexture(String prompt) {
-        // Simulate AI processing
-        Map<String, Object> result = new HashMap<>();
-        result.put("prompt", prompt);
-        result.put("textureUrl", "https://example.com/generated-texture.png"); // placeholder
-        result.put("status", "success");
-        return result;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
-    // You can add other AI-related methods here
+    // Fetch designer details for a given project
+    public User getDesignerDetails(Project project) {
+        if (project == null) {
+            return null;
+        }
+
+        // Replace this with the correct field/method from your Project entity
+        Long designerId = null;
+
+        // Example: if Project has a getDesigner() method
+        if (project.getDesigner() != null) {
+            designerId = project.getDesigner().getId();
+        }
+
+        if (designerId == null) {
+            return null;
+        }
+
+        // Fetch the designer user from the repository
+        return userRepository.findById(designerId).orElse(null);
+    }
 }

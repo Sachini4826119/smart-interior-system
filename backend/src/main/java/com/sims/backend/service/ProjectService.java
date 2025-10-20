@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjectService {
@@ -13,27 +14,23 @@ public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    // Save or update a project
+    public Project saveProject(Project project) {
+        return projectRepository.save(project);
+    }
+
+    // Get all projects
     public List<Project> getAllProjects() {
         return projectRepository.findAll();
     }
 
+    // Get a project by ID
     public Project getProjectById(Long id) {
-        return projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Optional<Project> project = projectRepository.findById(id);
+        return project.orElse(null); // Returns null if project not found
     }
 
-    public Project createProject(Project project) {
-        return projectRepository.save(project);
-    }
-
-    public Project updateProject(Long id, Project updatedProject) {
-        Project existing = getProjectById(id);
-        existing.setName(updatedProject.getName());
-        existing.setDescription(updatedProject.getDescription());
-        existing.setCustomer(updatedProject.getCustomer());
-        return projectRepository.save(existing);
-    }
-
+    // Delete a project by ID
     public void deleteProject(Long id) {
         projectRepository.deleteById(id);
     }

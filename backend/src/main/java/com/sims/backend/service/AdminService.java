@@ -1,37 +1,35 @@
 package com.sims.backend.service;
 
-import com.sims.backend.entity.Admin;
-import com.sims.backend.repository.AdminRepository;
+import com.sims.backend.entity.User;
+import com.sims.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class AdminService {
+
     @Autowired
-    private AdminRepository adminRepository;
+    private UserRepository userRepository;
 
-    public List<Admin> getAllAdmins() {
-        return adminRepository.findAll();
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
-    public Admin getAdminById(Long id) {
-        return adminRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+    // Convert Integer to Long before deleting
+    public void deleteUser(Integer userId) {
+        if (userId != null) {
+            userRepository.deleteById(userId.longValue());
+        }
     }
 
-    public Admin createAdmin(Admin admin) {
-        return adminRepository.save(admin);
+    // Or change method parameter to Long
+    public void deleteUser(Long userId) {
+        if (userId != null) {
+            userRepository.deleteById(userId);
+        }
     }
 
-    public Admin updateAdmin(Long id, Admin admin) {
-        Admin existing = getAdminById(id);
-        existing.setName(admin.getName());
-        existing.setEmail(admin.getEmail());
-        return adminRepository.save(existing);
-    }
-
-    public void deleteAdmin(Long id) {
-        adminRepository.deleteById(id);
-    }
+    // Add more admin-specific functions here
 }

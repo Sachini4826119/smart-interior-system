@@ -1,6 +1,8 @@
 package com.sims.backend.service;
 
 import com.sims.backend.entity.Receipt;
+import com.sims.backend.entity.Project;
+import com.sims.backend.entity.User;
 import com.sims.backend.repository.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,21 +12,35 @@ import java.util.Optional;
 
 @Service
 public class ReceiptService {
+
     @Autowired
     private ReceiptRepository receiptRepository;
 
-    public List<Receipt> getAllReceipts() { return receiptRepository.findAll(); }
-
-    public Receipt createReceipt(Receipt receipt) { return receiptRepository.save(receipt); }
-
-    public Receipt updateReceipt(Long id, Receipt receipt) {
-        Optional<Receipt> existing = receiptRepository.findById(id);
-        if (existing.isPresent()) {
-            receipt.setId(id);
-            return receiptRepository.save(receipt);
-        }
-        return null;
+    public Receipt saveReceipt(Receipt receipt) {
+        return receiptRepository.save(receipt);
     }
 
-    public void deleteReceipt(Long id) { receiptRepository.deleteById(id); }
+    public List<Receipt> getAllReceipts() {
+        return receiptRepository.findAll();
+    }
+
+    public Optional<Receipt> getReceiptById(Long id) {
+        return receiptRepository.findById(id);
+    }
+
+    public List<Receipt> getReceiptsByCustomer(User customer) {
+        return receiptRepository.findByCustomer(customer);
+    }
+
+    public List<Receipt> getReceiptsBySupplier(User supplier) {
+        return receiptRepository.findBySupplier(supplier);
+    }
+
+    public List<Receipt> getReceiptsByProject(Project project) {
+        return receiptRepository.findByProject(project);
+    }
+
+    public void deleteReceipt(Long id) {
+        receiptRepository.deleteById(id);
+    }
 }

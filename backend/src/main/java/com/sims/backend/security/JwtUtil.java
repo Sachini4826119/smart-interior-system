@@ -1,77 +1,93 @@
 package com.sims.backend.security;
 
+import com.sims.backend.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    // Secret key for signing JWTs (use a secure key in production!)
-    private final String SECRET_KEY = "your_secret_key_here_12345";
+    @Value("${jwt.secret:MySuperSecretKeyForJWTGenerationWhichIsVeryLongAndMustBeAtLeast256BitsFor256BitEncryption1234567890123456}")
+    private String secretKey;
 
-    // Token validity (e.g., 10 hours)
-    private final long JWT_EXPIRATION = 1000 * 60 * 60 * 10;
+    @Value("${jwt.expiration:36000000}") // 10 hours in milliseconds
+    private long expirationTime;
 
-    // Generate token for a user
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername());
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = secretKey.getBytes();
+        return new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    // Generate token from UserDetails
+    public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(getSigningKey())
                 .compact();
     }
 
-    // Extract username from token
+    // Overloaded: Generate token directly from User entity
+    public String generateToken(User user) {
+        return Jwts.builder()
+                .subject(user.getEmail())
+                .claim("role", user.getRole().name())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    // Extract username/email from token
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractAllClaims(token).getSubject();
     }
 
-    // Extract expiration date from token
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    // Alternative method name for compatibility
+    public String getUsernameFromToken(String token) {
+        return extractUsername(token);
     }
 
-    // Generic method to extract a claim
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+    // Get email from token (same as extractUsername since we use email as username)
+    public String getEmailFromToken(String token) {
+        return extractUsername(token);
     }
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody();
+    // Validate token
+    public boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    // Overloaded: validate token without UserDetails
+    public boolean validateToken(String token) {
+        try {
+            extractAllClaims(token);
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // Check if token is expired
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractAllClaims(token).getExpiration().before(new Date());
     }
 
-    // Validate token against UserDetails
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
-
-    // Optional: Validate token against username string
-    public boolean validateToken(String token, String username) {
-        return (extractUsername(token).equals(username) && !isTokenExpired(token));
+    // Extract all claims from token (JJWT 0.12.x compatible)
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
