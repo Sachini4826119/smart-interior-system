@@ -27,7 +27,7 @@ const Features = () => (
           cursor: 'pointer'
         }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)'; }}
            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)'; }}>
-          <div style={{ fontSize: '4rem', marginBottom: '20px' }}></div>  // Emoji icon (or <img src="/icons/ai-icon.png" />)
+          {/* Emoji icon removed */}
           <img 
             src="/images/ai-suggestion.jpg" 
             alt="AI Suggestions" 
@@ -50,7 +50,7 @@ const Features = () => (
           cursor: 'pointer'
         }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)'; }}
            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)'; }}>
-          <div style={{ fontSize: '4rem', marginBottom: '20px' }}>🖼️</div>  // Emoji icon (or <img src="/icons/3d-icon.png" />)
+          {/* 3D Preview icon removed */}
           <img 
             src="/images/3d-preview.jpg" 
             alt="3D Preview" 
@@ -73,7 +73,7 @@ const Features = () => (
           cursor: 'pointer'
         }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)'; }}
            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)'; }}>
-          <div style={{ fontSize: '4rem', marginBottom: '20px' }}>📋</div>  // Emoji icon (or <img src="/icons/project-icon.png" />)
+          {/* Project Management icon removed */}
           <img 
             src="/images/project-management.jpg" 
             alt="Project Management" 
